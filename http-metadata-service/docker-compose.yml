@@ -1,0 +1,81 @@
+# =============================================================================
+# HTTP Metadata Inventory Service — Docker Compose
+# =============================================================================
+# Usage:
+#   Start:   docker-compose up --build
+#   Stop:    docker-compose down
+#   Logs:    docker-compose logs -f api
+#   Reset:   docker-compose down -v  (removes MongoDB data)
+# =============================================================================
+
+version: "3.8"
+
+services:
+  # ---------------------------------------------------------------------------
+  # API Service — FastAPI Application
+  # ---------------------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: metadata-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # Override MONGO_URL to use Docker service name for internal DNS
+      - MONGO_URL=mongodb://mongodb:27017
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - metadata-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      start_period: 15s
+      retries: 3
+
+  # ---------------------------------------------------------------------------
+  # MongoDB — Document Database
+  # ---------------------------------------------------------------------------
+  mongodb:
+    image: mongo:7.0
+    container_name: metadata-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+    networks:
+      - metadata-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+    # Resource limits for local development
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+# ---------------------------------------------------------------------------
+# Volumes — Persistent Storage
+# ---------------------------------------------------------------------------
+volumes:
+  mongodb_data:
+    driver: local
+    name: metadata-mongodb-data
+
+# ---------------------------------------------------------------------------
+# Networks — Service Communication
+# ---------------------------------------------------------------------------
+networks:
+  metadata-network:
+    driver: bridge
+    name: metadata-network

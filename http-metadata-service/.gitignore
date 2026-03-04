@@ -1,0 +1,32 @@
+# =============================================================================
+# Git Ignore — HTTP Metadata Inventory Service
+# =============================================================================
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# --- Virtual Environments ---
+.venv/
+venv/
+
+# --- IDE ---
+.vscode/
+
+# --- Testing ---
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# --- Environment ---
+.env
+
+# --- Logs ---
+*.log

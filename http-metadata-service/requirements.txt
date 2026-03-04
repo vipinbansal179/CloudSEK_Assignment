@@ -1,0 +1,22 @@
+# Web Framework
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+
+# Async HTTP Client
+httpx==0.28.1
+
+# MongoDB Async Driver
+motor==3.7.0
+pymongo==4.10.1
+
+# Settings Management
+pydantic==2.10.4
+pydantic-settings==2.7.1
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.25.0
+pytest-cov==6.0.0
+httpx>=0.28.1
+mongomock==4.3.0
+mongomock-motor==0.0.34
